@@ -1,0 +1,35 @@
+# Data & privacy
+
+Session Exporter reads your local session files directly. **Nothing leaves your machine** — there is no account, no telemetry, and no network call except serving the UI to your own browser on `127.0.0.1`.
+
+## Where the data comes from
+
+| Source | Location | Token basis |
+| --- | --- | --- |
+| **Claude Code** | `~/.claude/projects/<folder>/<uuid>.jsonl` | `recorded` — summed `usage`, including cache create/read |
+| **Codex** | `~/.codex/sessions/**/rollout-*.jsonl` (and `archived_sessions/`) | `recorded` — the final `token_count` event (includes cached input & reasoning) |
+| **Cursor** | the global SQLite DB `…/Cursor/User/globalStorage/state.vscdb` | `context-snapshot` — see below |
+
+### Claude Code
+
+Each project folder holds one JSONL file per session. Token usage is summed from every assistant turn's `usage` object, and the 5-minute / 1-hour cache-write split is read out for accurate cost. The project path comes from the `cwd` recorded in the log.
+
+### Codex
+
+Rollout files can reach hundreds of megabytes. Session Exporter streams them — counting messages at the byte level and JSON-parsing only the head (session metadata, first user message, model) and tail (final token count) — so a 650 MB session lists in well under a second. Message counts on very large sessions are a fast byte-level estimate (±a couple of system turns); every other number is exact.
+
+### Cursor
+
+Cursor stores everything in one large SQLite database. Session Exporter opens it **strictly read-only** (`?mode=ro`, falling back to `?immutable=1`) and only ever does indexed primary-key lookups — it never writes to, locks, or otherwise touches your live Cursor database, even while Cursor is running.
+
+Cursor does not record cumulative token spend or cache activity — only the size of a session's final context window. Session Exporter surfaces that number honestly as `context-snapshot` (marked with `~`) and does **not** compute a cost for it, rather than inventing one.
+
+## The cache
+
+The scan result is written to `.cache/index.json` next to the app, keyed by a fingerprint of your session files (paths + sizes + modification times). If nothing changed, relaunches load from cache instantly. If files changed, or you click **Refresh**, the index is rebuilt. Deleting `.cache/` just forces a fresh scan — it's safe.
+
+Cost is applied to the cached index on every load, so editing `pricing.json` takes effect on the next launch (or immediately via **↻ Reload prices**) without re-parsing your data.
+
+## Adding a fourth source
+
+Each parser is a single file in `parsers/` implementing a small contract — `list_sessions()` and `load_messages()`. Adding another tool is one new file; nothing else in the app needs to know about it.

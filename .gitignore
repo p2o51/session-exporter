@@ -1,0 +1,15 @@
+# app
+.cache/
+__pycache__/
+*.pyc
+.DS_Store
+
+# docs site (Rspress / Node)
+node_modules/
+website/node_modules/
+website/doc_build/
+website/.rspress/
+*.log
+
+# Claude Code local config
+.claude/

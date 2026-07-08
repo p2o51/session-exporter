@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Session Exporter</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗂️</text></svg>" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5Z" />
+        <path d="M3 12l9 4.5L21 12" />
+        <path d="M3 16.5 12 21l9-4.5" />
+      </svg>
+      <div class="brand-text">
+        <h1>Session Exporter</h1>
+        <p class="sub">Claude Code · Codex · Cursor</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="topstat" id="topstat" title="Total tokens across the current filter"></div>
+      <button class="btn ghost" id="refresh" title="Re-scan session files">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M20 11A8 8 0 1 0 12 20a8 8 0 0 0 7.5-5"/><path d="M20 4v5h-5"/></svg>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="filters" id="filters">
+      <div class="fgroup">
+        <div class="field search">
+          <svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="query" placeholder="Search title or project…" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fhead">Source</div>
+        <div id="sourceFilters" class="chips"></div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fhead">Project<span class="fhint" id="projCount"></span></div>
+        <div class="field mini">
+          <input type="search" id="projQuery" placeholder="Filter projects…" autocomplete="off" />
+        </div>
+        <div id="projectFilters" class="checklist"></div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fhead">Date range</div>
+        <div class="daterow">
+          <input type="date" id="dateFrom" />
+          <span class="dash">–</span>
+          <input type="date" id="dateTo" />
+        </div>
+      </div>
+
+      <button class="reset" id="reset">Reset filters</button>
+    </aside>
+
+    <main class="content">
+      <div class="listbar">
+        <label class="selall">
+          <input type="checkbox" id="selectAll" />
+          <span id="selectAllLabel">Select all</span>
+        </label>
+        <div class="count" id="count"></div>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="statsBtn" title="Cost &amp; usage by date and model">
+          <svg viewBox="0 0 24 24" class="ic"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <span>Stats</span>
+        </button>
+        <label class="sort">
+          <span>Sort</span>
+          <select id="sort">
+            <option value="updated">Recently updated</option>
+            <option value="created">Recently created</option>
+            <option value="cost">Most expensive</option>
+            <option value="tokens">Most tokens</option>
+            <option value="messages">Most messages</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table class="sessions">
+          <thead>
+            <tr>
+              <th class="c-check"></th>
+              <th class="c-title">Session</th>
+              <th class="c-source">Source</th>
+              <th class="c-project">Project</th>
+              <th class="c-date">Updated</th>
+              <th class="c-num">Msgs</th>
+              <th class="c-num">Tokens</th>
+              <th class="c-num">Cost</th>
+              <th class="c-num">Cache</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>
+          <p>No sessions match these filters.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- selection action bar -->
+  <div class="selbar" id="selbar" hidden>
+    <div class="selinfo" id="selinfo"></div>
+    <div class="selactions">
+      <button class="btn ghost" id="clearSel">Clear</button>
+      <button class="btn" id="exportRaw">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span>Export ZIP</span>
+      </button>
+      <button class="btn primary" id="exportNotion">
+        <svg viewBox="0 0 24 24" class="ic"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8v8l4-3 4 3V8"/></svg>
+        <span>Export for Notion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- detail drawer -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" hidden aria-label="Session detail"></aside>
+
+  <!-- stats drawer -->
+  <aside class="drawer" id="statsDrawer" hidden aria-label="Cost and usage stats"></aside>
+
+  <!-- first-scan loading -->
+  <div class="loading" id="loading">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <p class="loading-title">Indexing your sessions</p>
+      <p class="loading-sub" id="loadingSub">Reading Claude Code, Codex &amp; Cursor history…</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
