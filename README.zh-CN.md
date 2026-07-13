@@ -27,16 +27,14 @@
 
 - **五个工具，一个列表** —— 所有 Claude Code / Codex / Cursor / Antigravity / Pi Agent 会话汇总在一起。
   可按来源、项目文件夹、日期区间、全文搜索筛选；可按时间、花费、token、大小排序。
-- **多选 → ZIP 导出** —— 勾选或全选（跟随当前筛选），导出一个自包含压缩包：元数据索引，
-  外加每个会话的 JSON 和可读的 Markdown 转录。
-- **导出到 Notion** —— 一个 CSV + 同名 Markdown 文件夹，Notion 会把它导入成数据库
-  （转录作为页面正文，元数据作为属性），于是你能在 Notion 里重建筛选。
+- **多选 → 导出菜单** —— 勾选或全选（跟随当前筛选），可导出 ZIP 压缩包、Notion 导入包、JSON，
+  或 Markdown 报表（图片导出即将支持）。
 - **含缓存的 token 统计** —— 厂商真实记录的 输入 / 输出 / 缓存读 / 缓存写 / 推理 token，
   以及缓存命中率，按会话和按选中项统计。
-- **花费估算** —— 每个会话按 token × 各模型单价计价，缓存读（0.1×）和 Anthropic 缓存写
-  （1.25× / 2×）都正确计费。**Stats 面板**按**模型**和**日期**拆分花费。单价存放在可编辑的
+- **花费估算** —— 每个会话按 token × 各模型单价计价，缓存读与 Anthropic / Pi 缓存写都正确计费。
+  展开选中栏即可查看按**模型**和**日期**拆分的 **Stats**。单价存放在可编辑的
   [`pricing.json`](pricing.json) 里。
-- **本地且私密** —— 纯 Python 3.9+ 标准库，**零依赖**。Cursor 与 Antigravity 数据库严格只读打开。
+- **本地且私密** —— 纯 Python 3.9+ 标准库，**零依赖**。Cursor、Antigravity 等本地数据库严格只读打开。
 
 ## 截图
 
@@ -90,7 +88,7 @@ server.py         标准库 HTTP 服务器 + JSON/zip API
 model.py          内存 + 磁盘索引，token 汇总
 pricing.py        按模型、缓存感知的花费引擎
 pricing.json      可编辑的各模型单价（$/1M tokens）
-exporters.py      raw-zip 与 Notion-zip 构建
+exporters.py      ZIP / Notion / JSON / Markdown 导出构建
 parsers/          claude · codex · cursor · antigravity · pi（每个来源一份契约）
 web/              index.html · styles.css · app.js（界面）
 website/          Rspress 文档站（三语）

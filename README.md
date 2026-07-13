@@ -29,17 +29,15 @@ Nothing leaves your machine.
 - **One list, five tools** — every Claude Code / Codex / Cursor / Antigravity / Pi Agent session
   together. Filter by source, project folder, date range, and full-text search; sort by recency,
   cost, tokens, or size.
-- **Multi-select → ZIP** — select or select-all (following the active filter), then export a
-  self-contained archive: a metadata index plus per-session JSON and a readable Markdown transcript.
-- **Export for Notion** — a CSV + matching Markdown folder that Notion imports as a database
-  (transcript as page body, metadata as properties), so you rebuild your filters inside Notion.
+- **Multi-select → export menu** — select or select-all (following the active filter), then export
+  as a ZIP archive, Notion import pack, JSON dump, or Markdown report (image export coming soon).
 - **Token accounting with cache** — real, provider-recorded input / output / cache-read /
   cache-write / reasoning tokens, plus cache-hit rate, per session and per selection.
 - **Cost estimation** — every session priced from its tokens × per-model rates, with cache reads
-  (0.1×) and Anthropic cache writes (1.25× / 2×) billed correctly. A **Stats** panel breaks cost
-  down **by model** and **by date**. Rates live in an editable [`pricing.json`](pricing.json).
-- **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor and
-  Antigravity databases are opened strictly read-only.
+  (0.1×) and Anthropic / Pi cache writes billed correctly. Expand the selection bar for **Stats**
+  by model and by date. Rates live in an editable [`pricing.json`](pricing.json).
+- **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor,
+  Antigravity, and other local databases are opened strictly read-only.
 
 ## Screenshots
 
@@ -93,7 +91,7 @@ server.py         stdlib HTTP server + JSON/zip API
 model.py          in-memory + on-disk index, token aggregation
 pricing.py        per-model, cache-aware cost engine
 pricing.json      editable per-model rates ($/1M tokens)
-exporters.py      raw-zip and Notion-zip builders
+exporters.py      ZIP / Notion / JSON / Markdown export builders
 parsers/          claude · codex · cursor · antigravity · pi (one contract per source)
 web/              index.html · styles.css · app.js  (the UI)
 website/          the Rspress documentation site (trilingual)
