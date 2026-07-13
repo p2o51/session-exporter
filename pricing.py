@@ -10,6 +10,8 @@ source-aware because the tools record token usage with different semantics:
                   uncached = input - cached; output already includes reasoning.
   * Antigravity — gen_metadata input is UNCACHED (system + new); cache_read is
                   separate. Gemini bills thinking/reasoning at the output rate.
+  * Pi Agent    — usage.input is UNCACHED; cacheRead / cacheWrite are separate
+                  (same shape as Claude-style accounting).
   * Cursor      — only a context-window snapshot is recorded, not actual spend, so
                   cost is reported as unknown (None).
 
@@ -86,16 +88,17 @@ def cost_for(session: dict) -> dict:
     else:
         usd = out / _M * out_rate
 
-    if source in ("claude", "antigravity"):
+    if source in ("claude", "antigravity", "pi"):
         # input is uncached; cache_read is a separate line item.
         usd += inp / _M * in_rate
         usd += cr / _M * cr_rate
-        if source == "claude":
+        if source in ("claude", "pi"):
             cw5_rate = float(r.get("cache_write_5m", in_rate * 1.25))
             cw1_rate = float(r.get("cache_write_1h", in_rate * 2))
             c5 = t.get("cache_creation_5m")
             c1 = t.get("cache_creation_1h")
             if c5 is None and c1 is None:
+                # Pi records a single cacheWrite total — bill at the 5m rate.
                 usd += int(t.get("cache_creation") or 0) / _M * cw5_rate
             else:
                 usd += int(c5 or 0) / _M * cw5_rate

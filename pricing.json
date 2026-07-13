@@ -22,7 +22,10 @@
     "kimi-k2.6":           {"input": 0.95,  "output": 4.0,  "cache_read": 0.16},
 
     "glm-5.2":             {"input": 1.4,   "output": 4.4,  "cache_read": 0.26},
+    "glm-5.1":             {"input": 0.6,   "output": 1.92, "cache_read": 0.12, "estimated": true},
     "glm-5":               {"input": 0.6,   "output": 1.92, "cache_read": 0.12, "estimated": true},
+    "deepseek-v4-flash":   {"input": 0.14,  "output": 0.28, "cache_read": 0.014, "estimated": true},
+    "deepseek-v4-pro":     {"input": 0.55,  "output": 2.19, "cache_read": 0.055, "estimated": true},
 
     "gemini-3-flash":         {"input": 0.5,  "output": 3.0,  "cache_read": 0.05},
     "gemini-3.5-flash":       {"input": 1.5,  "output": 9.0,  "cache_read": 0.15, "estimated": true},
@@ -36,6 +39,8 @@
     "gpt-5.5-codex": "gpt-5.5",
     "gpt-5.4-codex": "gpt-5.4",
     "gpt-5-codex": "gpt-5",
+    "moonshotai/kimi-k2.6": "kimi-k2.6",
+    "kimi-k2.6-preview": "kimi-k2.6",
 
     "gemini-3-flash-a": "gemini-3-flash",
     "gemini-3-flash-agent": "gemini-3-flash",

@@ -23,6 +23,7 @@ SOURCE_LABEL = {
     "codex": "Codex",
     "cursor": "Cursor",
     "antigravity": "Antigravity",
+    "pi": "Pi Agent",
 }
 
 

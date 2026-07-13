@@ -18,6 +18,7 @@
   --codex:      #2f8f6f;
   --cursor:     #5a63d6;
   --antigravity:#1a73e8;
+  --pi:         #c45c26;
   --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Songti SC", "Noto Serif CJK SC", serif;
   --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
@@ -39,6 +40,7 @@
     --codex:      #4bb992;
     --cursor:     #8b92e8;
     --antigravity:#8ab4f8;
+    --pi:         #e08a52;
   }
 }
 
@@ -138,6 +140,7 @@ button, input, select { font-family: inherit; font-size: inherit; color: inherit
 .chip .n { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12.5px; }
 .dot.claude { background: var(--claude); } .dot.codex { background: var(--codex); }
 .dot.cursor { background: var(--cursor); } .dot.antigravity { background: var(--antigravity); }
+.dot.pi { background: var(--pi); }
 
 .checklist { display: flex; flex-direction: column; gap: 1px; max-height: 260px; overflow-y: auto;
   margin: 0 -4px; padding: 2px 4px; }
@@ -198,6 +201,7 @@ table.sessions { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .badge.codex  { color: var(--codex);  background: color-mix(in srgb, var(--codex) 12%, transparent); }
 .badge.cursor { color: var(--cursor); background: color-mix(in srgb, var(--cursor) 12%, transparent); }
 .badge.antigravity { color: var(--antigravity); background: color-mix(in srgb, var(--antigravity) 12%, transparent); }
+.badge.pi { color: var(--pi); background: color-mix(in srgb, var(--pi) 12%, transparent); }
 .proj { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
 .date { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
 .tok { color: var(--ink); }

@@ -45,6 +45,8 @@ def _fingerprint() -> str:
     # Antigravity IDE + CLI: one SQLite DB per conversation.
     stat_glob("~/.gemini/antigravity/conversations/*.db")
     stat_glob("~/.gemini/antigravity-cli/conversations/*.db")
+    # Pi Agent: JSONL transcripts under encoded cwd folders.
+    stat_glob("~/.pi/agent/sessions/**/*.jsonl", recursive=True)
 
     parts.sort()
     import hashlib

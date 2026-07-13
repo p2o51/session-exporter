@@ -10,6 +10,7 @@ Session Exporter reads your local session files directly. **Nothing leaves your 
 | **Codex** | `~/.codex/sessions/**/rollout-*.jsonl` (and `archived_sessions/`) | `recorded` — the final `token_count` event (includes cached input & reasoning) |
 | **Cursor** | the global SQLite DB `…/Cursor/User/globalStorage/state.vscdb` | `context-snapshot` — see below |
 | **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` | `recorded` — `gen_metadata` usage (input, cache read, output, reasoning) |
+| **Pi Agent** | `~/.pi/agent/sessions/**/*.jsonl` | `recorded` — per-turn `usage` (input, output, cacheRead, cacheWrite) |
 
 ### Claude Code
 
@@ -30,6 +31,10 @@ Cursor does not record cumulative token spend or cache activity — only the siz
 Antigravity (IDE and CLI) stores one SQLite database per conversation under `~/.gemini/antigravity/conversations/` and `~/.gemini/antigravity-cli/conversations/`. Session Exporter opens each DB **read-only** (preferring `?immutable=1` so WAL sidecars never block the scan) and decodes the protobuf blobs in `gen_metadata` / `steps` / `trajectory_metadata_blob` with a tiny wire-format reader — no third-party protobuf dependency.
 
 Token totals come from recorded generation metadata (uncached input, cache reads, output text, and reasoning). Workspace paths come from the trajectory metadata. Legacy encrypted `.pb` conversation files are skipped; only the SQLite `.db` format is supported.
+
+### Pi Agent
+
+Pi Agent stores one JSONL file per session under `~/.pi/agent/sessions/<encoded-cwd>/`. Each file opens with a `type:"session"` header (id, cwd, timestamp), then a stream of `message` events. Assistant turns carry recorded `usage` with `input` / `output` / `cacheRead` / `cacheWrite`. Session Exporter sums those fields and renders text, thinking, and toolCall blocks into the transcript.
 
 ## The cache
 

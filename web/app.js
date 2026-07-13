@@ -21,6 +21,7 @@ const SOURCE_LABEL = {
   codex: "Codex",
   cursor: "Cursor",
   antigravity: "Antigravity",
+  pi: "Pi Agent",
 };
 const key = (s) => `${s.source}::${s.id}`;
 const $ = (id) => document.getElementById(id);
