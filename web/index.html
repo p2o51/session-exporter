@@ -71,10 +71,6 @@
         </label>
         <div class="count" id="count"></div>
         <div class="spacer"></div>
-        <button class="btn ghost" id="statsBtn" title="Cost &amp; usage by date and model">
-          <svg viewBox="0 0 24 24" class="ic"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-          <span>Stats</span>
-        </button>
         <label class="sort">
           <span>Sort</span>
           <select id="sort">
@@ -112,28 +108,37 @@
     </main>
   </div>
 
-  <!-- selection action bar -->
+  <!-- selection action bar (expandable stats sheet) -->
   <div class="selbar" id="selbar" hidden>
-    <div class="selinfo" id="selinfo"></div>
-    <div class="selactions">
-      <button class="btn ghost" id="clearSel">Clear</button>
-      <button class="btn" id="exportRaw">
-        <svg viewBox="0 0 24 24" class="ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-        <span>Export ZIP</span>
+    <div class="selbar-chrome">
+      <button class="btn ghost icon-only" id="selExpand" title="Stats for selection" aria-expanded="false" aria-controls="selStats">
+        <svg viewBox="0 0 24 24" class="ic chevron"><path d="M6 14l6-6 6 6"/></svg>
       </button>
-      <button class="btn primary" id="exportNotion">
-        <svg viewBox="0 0 24 24" class="ic"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8v8l4-3 4 3V8"/></svg>
-        <span>Export for Notion</span>
-      </button>
+      <div class="selinfo" id="selinfo"></div>
+      <div class="selactions">
+        <button class="btn ghost" id="clearSel">Clear</button>
+        <div class="dropdown" id="exportMenu">
+          <button class="btn primary" id="exportBtn" aria-haspopup="menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" class="ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            <span>Export</span>
+            <svg viewBox="0 0 24 24" class="ic chevron-sm"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-menu" id="exportDropdown" role="menu" hidden>
+            <button type="button" role="menuitem" data-format="raw">ZIP archive</button>
+            <button type="button" role="menuitem" data-format="notion">Notion</button>
+            <button type="button" role="menuitem" data-format="json">JSON</button>
+            <button type="button" role="menuitem" data-format="md">Markdown report</button>
+            <button type="button" role="menuitem" data-format="image" class="soon">Image…</button>
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="selbar-sheet" id="selStats" hidden></div>
   </div>
 
   <!-- detail drawer -->
   <div class="scrim" id="scrim" hidden></div>
   <aside class="drawer" id="drawer" hidden aria-label="Session detail"></aside>
-
-  <!-- stats drawer -->
-  <aside class="drawer" id="statsDrawer" hidden aria-label="Cost and usage stats"></aside>
 
   <!-- first-scan loading -->
   <div class="loading" id="loading">

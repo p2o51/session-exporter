@@ -40,6 +40,20 @@ accounting (including cache hits) and cache-aware **cost estimation**. Nothing l
 - **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor and
   Antigravity databases are opened strictly read-only.
 
+## Screenshots
+
+![Session list with selection bar](pics/list.png)
+
+*Main list and selection bar*
+
+![Source filter chips](pics/sources.png)
+
+*Source chips*
+
+![Cost and usage stats](pics/stats.png)
+
+*Cost & usage stats*
+
 ## Quick start
 
 ```bash

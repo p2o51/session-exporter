@@ -1,10 +1,12 @@
-"""Build the two export archives.
+"""Build export payloads for download.
 
 raw ZIP     — a self-contained dump: index.json + index.csv + per-session .json and .md.
 notion ZIP  — the shape Notion's "Import → CSV/Markdown" understands: a top-level
               Sessions.csv plus a Sessions/ folder whose <Name>.md files match the
               CSV's first (title) column, so each row imports with its transcript as
               the page body and the metadata as database properties.
+JSON        — sessions.json with {exported_at, filter, sessions:[{meta,messages}]}.
+Markdown    — sessions-report.md: summary table + per-session transcripts.
 """
 
 from __future__ import annotations
@@ -226,3 +228,50 @@ def build_notion_zip(items: list[dict], filter_meta: dict | None = None) -> byte
                    "   Source or Project, sort by Updated or Total Tokens).\n\n"
                    f"Exported {summary['count']} session(s) at {summary['exported_at']}.\n")
     return buf.getvalue()
+
+
+def build_json_export(items: list[dict], filter_meta: dict | None = None) -> bytes:
+    """Single JSON file: metadata + full transcripts for each session."""
+    return json.dumps(
+        {
+            "exported_at": _now_iso(),
+            "filter": filter_meta or {},
+            "sessions": [{"meta": it["meta"], "messages": it["messages"]} for it in items],
+        },
+        ensure_ascii=False,
+        indent=2,
+    ).encode("utf-8")
+
+
+def build_markdown_report(items: list[dict], filter_meta: dict | None = None) -> bytes:
+    """Single Markdown report: summary table + per-session sections."""
+    summary = _filter_summary(filter_meta, items)
+    lines = [
+        "# Session export report",
+        "",
+        f"Exported **{summary['count']}** session(s) · "
+        f"**{human_tokens(summary['total_tokens'])}** total tokens · "
+        f"{summary['exported_at']}",
+        "",
+        "| # | Source | Project | Title | Messages | Tokens | Cost |",
+        "|---|--------|---------|-------|----------|--------|------|",
+    ]
+    for i, it in enumerate(items, 1):
+        meta = it["meta"]
+        t = meta.get("tokens") or {}
+        cost = meta.get("cost_usd")
+        cost_s = f"${float(cost):,.4f}" if cost is not None else "—"
+        title = (meta.get("title") or "Untitled").replace("|", "\\|")
+        proj = (meta.get("project") or "—").replace("|", "\\|")
+        src = SOURCE_LABEL.get(meta.get("source"), meta.get("source") or "—")
+        lines.append(
+            f"| {i} | {src} | {proj} | {title} | "
+            f"{meta.get('message_count', 0)} | {human_tokens(t.get('total'))} | {cost_s} |"
+        )
+    lines += ["", "---", ""]
+    for it in items:
+        lines.append(render_markdown(it["meta"], it["messages"]))
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+    return "\n".join(lines).encode("utf-8")

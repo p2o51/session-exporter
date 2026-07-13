@@ -249,7 +249,12 @@ function updateSelectAll() {
 function updateSelBar() {
   const bar = $("selbar");
   const items = [...state.selected].map((k) => state.index.get(k)).filter(Boolean);
-  if (!items.length) { bar.hidden = true; return; }
+  if (!items.length) {
+    collapseSelStats();
+    bar.hidden = true;
+    closeExportMenu();
+    return;
+  }
   bar.hidden = false;
   let total = 0, read = 0, cacheable = 0, anyCache = false, cost = 0;
   for (const s of items) {
@@ -263,6 +268,7 @@ function updateSelBar() {
     `<b>${items.length}</b> selected <span class="muted">·</span> <b>${humanTokens(total)}</b> tokens` +
     ` <span class="muted">·</span> <b>${fmtUSD(cost)}</b>` +
     (hit ? ` <span class="muted">·</span> <b>${hit}</b> <span class="muted">cache hit</span>` : "");
+  if (bar.classList.contains("expanded")) renderSelStats();
 }
 
 /* ── detail drawer ──────────────────────────────────────────────────────── */
@@ -337,12 +343,11 @@ function renderTranscript(messages) {
 
 function closeOverlays() {
   $("drawer").hidden = true;
-  $("statsDrawer").hidden = true;
   $("scrim").hidden = true;
 }
 const closeDetail = closeOverlays;
 
-/* ── stats panel (cost & usage by model / date, for the current filter) ──── */
+/* ── selbar stats sheet (selected sessions) ─────────────────────────────── */
 function aggBy(sessions, keyFn) {
   const m = new Map();
   for (const s of sessions) {
@@ -356,12 +361,11 @@ function aggBy(sessions, keyFn) {
   return [...m.values()];
 }
 
-function openStats() {
-  const rows = state.filtered;
-  $("scrim").hidden = false;
-  const d = $("statsDrawer");
-  d.hidden = false;
+function selectedSessions() {
+  return [...state.selected].map((k) => state.index.get(k)).filter(Boolean);
+}
 
+function renderStatsInto(container, rows) {
   let tokens = 0, cost = 0, priced = 0, unpriced = 0, read = 0, cacheable = 0, anyCache = false;
   for (const s of rows) {
     tokens += s.tokens?.total || 0;
@@ -376,7 +380,7 @@ function openStats() {
   const maxM = Math.max(1, ...byModel.map((e) => e.cost));
   const maxD = Math.max(1, ...byDate.map((e) => e.cost));
 
-  const costCell = (e, max) => {
+  const costCell = (e) => {
     if (e.priced === 0) return `<td class="r"><span class="dash-cell">—</span></td>`;
     const approx = e.priced < e.n ? `<span class="mono" title="${e.n - e.priced} not priced">~</span> ` : "";
     return `<td class="r">${approx}${fmtUSD(e.cost)}</td>`;
@@ -387,22 +391,14 @@ function openStats() {
   const modelRows = byModel.map((e) => {
     const model = e.key.split("::")[1];
     const label = `<span class="badge ${e.source}"><span class="dot ${e.source}"></span>${SOURCE_LABEL[e.source] || e.source}</span> ${esc(model)}`;
-    return `<tr>${barCell(label, e, maxM)}<td class="r">${e.n}</td><td class="r">${humanTokens(e.tokens)}</td>${costCell(e, maxM)}</tr>`;
+    return `<tr>${barCell(label, e, maxM)}<td class="r">${e.n}</td><td class="r">${humanTokens(e.tokens)}</td>${costCell(e)}</tr>`;
   }).join("");
 
   const dateRows = byDate.map((e) =>
-    `<tr>${barCell(esc(e.key), e, maxD)}<td class="r">${e.n}</td><td class="r">${humanTokens(e.tokens)}</td>${costCell(e, maxD)}</tr>`).join("");
+    `<tr>${barCell(esc(e.key), e, maxD)}<td class="r">${e.n}</td><td class="r">${humanTokens(e.tokens)}</td>${costCell(e)}</tr>`).join("");
 
-  const scope = rows.length === state.all.length ? "all sessions" : "the current filter";
-  d.innerHTML =
-    `<div class="drawer-head">
-       <div class="row1">
-         <h2 class="drawer-title">Cost &amp; usage</h2>
-         <button class="drawer-close" title="Close"><svg viewBox="0 0 24 24" class="ic"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-       </div>
-       <div class="meta-line">Across <b>${scope}</b> — ${rows.length.toLocaleString()} session${rows.length === 1 ? "" : "s"}.</div>
-     </div>
-     <div class="stats-body">
+  container.innerHTML =
+    `<div class="stats-body">
      <div class="stats-tiles">
        <div class="cell"><div class="k">Sessions</div><div class="v">${rows.length.toLocaleString()}</div></div>
        <div class="cell"><div class="k">Tokens</div><div class="v">${humanTokens(tokens)}</div></div>
@@ -420,6 +416,7 @@ function openStats() {
        <tbody>${dateRows || '<tr><td colspan="4">—</td></tr>'}</tbody></table>
      </div>
      <div class="stats-note">
+       Across <b>selected sessions</b> — ${rows.length.toLocaleString()} session${rows.length === 1 ? "" : "s"}.
        Cost is estimated from provider-recorded token usage × <code>pricing.json</code> (cache reads/writes included).
        ${unpriced ? `${unpriced} session${unpriced === 1 ? "" : "s"} not priced (Cursor context-snapshots, or models missing from pricing.json).` : ""}
        A <b>~</b> marks rows using an estimated rate.
@@ -427,8 +424,38 @@ function openStats() {
      <div class="stats-actions"><button class="btn ghost" id="reloadPrices">↻ Reload prices from pricing.json</button></div>
      </div>`;
 
-  d.querySelector(".drawer-close").onclick = closeOverlays;
-  d.querySelector("#reloadPrices").onclick = reloadPrices;
+  container.querySelector("#reloadPrices").onclick = reloadPrices;
+}
+
+function renderSelStats() {
+  renderStatsInto($("selStats"), selectedSessions());
+}
+
+function expandSelStats() {
+  const bar = $("selbar");
+  if (bar.hidden) return;
+  bar.classList.add("expanded");
+  $("selStats").hidden = false;
+  $("selExpand").setAttribute("aria-expanded", "true");
+  $("selExpand").title = "Hide stats";
+  renderSelStats();
+}
+
+function collapseSelStats() {
+  const bar = $("selbar");
+  bar.classList.remove("expanded");
+  $("selStats").hidden = true;
+  $("selStats").innerHTML = "";
+  const btn = $("selExpand");
+  if (btn) {
+    btn.setAttribute("aria-expanded", "false");
+    btn.title = "Stats for selection";
+  }
+}
+
+function toggleSelStats() {
+  if ($("selbar").classList.contains("expanded")) collapseSelStats();
+  else expandSelStats();
 }
 
 async function reloadPrices() {
@@ -442,7 +469,7 @@ async function reloadPrices() {
       if (n) { s.cost_usd = n.cost_usd; s.cost_known = n.cost_known; s.cost_estimated = n.cost_estimated; }
     }
     render();
-    openStats();
+    if ($("selbar").classList.contains("expanded")) renderSelStats();
     toast("Prices reloaded");
   } catch (e) { toast("Reload failed"); }
 }
@@ -459,11 +486,38 @@ function currentFilter() {
   };
 }
 
+const EXPORT_DEFAULTS = {
+  raw: "sessions-export.zip",
+  notion: "sessions-notion.zip",
+  json: "sessions.json",
+  md: "sessions-report.md",
+};
+
+function closeExportMenu() {
+  const menu = $("exportDropdown");
+  const btn = $("exportBtn");
+  if (!menu || !btn) return;
+  menu.hidden = true;
+  btn.setAttribute("aria-expanded", "false");
+}
+
+function toggleExportMenu() {
+  const menu = $("exportDropdown");
+  const open = menu.hidden;
+  menu.hidden = !open;
+  $("exportBtn").setAttribute("aria-expanded", open ? "true" : "false");
+}
+
 async function doExport(format) {
-  const items = [...state.selected].map((k) => state.index.get(k)).filter(Boolean).map((s) => ({ source: s.source, id: s.id }));
+  if (format === "image") {
+    toast("Image export coming soon");
+    return;
+  }
+  const items = selectedSessions().map((s) => ({ source: s.source, id: s.id }));
   if (!items.length) return;
-  const btnRaw = $("exportRaw"), btnNotion = $("exportNotion");
-  btnRaw.disabled = btnNotion.disabled = true;
+  const btn = $("exportBtn");
+  btn.disabled = true;
+  closeExportMenu();
   toast(`Preparing ${items.length} session${items.length > 1 ? "s" : ""}…`, true);
   try {
     const res = await fetch("/api/export", {
@@ -473,7 +527,7 @@ async function doExport(format) {
     });
     if (!res.ok) throw new Error((await res.json()).error || "export failed");
     const blob = await res.blob();
-    let fname = format === "notion" ? "sessions-notion.zip" : "sessions-export.zip";
+    let fname = EXPORT_DEFAULTS[format] || "sessions-export.zip";
     const cd = res.headers.get("Content-Disposition");
     const m = cd && cd.match(/filename="([^"]+)"/);
     if (m) fname = m[1];
@@ -485,7 +539,7 @@ async function doExport(format) {
   } catch (e) {
     toast("Export failed: " + e.message);
   } finally {
-    btnRaw.disabled = btnNotion.disabled = false;
+    btn.disabled = false;
   }
 }
 
@@ -512,9 +566,22 @@ function wireStaticEvents() {
     for (const s of state.filtered) { const k = key(s); check ? state.selected.add(k) : state.selected.delete(k); }
     render();
   };
-  $("clearSel").onclick = () => { state.selected.clear(); render(); };
-  $("exportRaw").onclick = () => doExport("raw");
-  $("exportNotion").onclick = () => doExport("notion");
+  $("clearSel").onclick = () => {
+    state.selected.clear();
+    collapseSelStats();
+    closeExportMenu();
+    render();
+  };
+  $("selExpand").onclick = (e) => { e.stopPropagation(); toggleSelStats(); };
+  $("exportBtn").onclick = (e) => { e.stopPropagation(); toggleExportMenu(); };
+  $("exportDropdown").onclick = (e) => {
+    const item = e.target.closest("[data-format]");
+    if (!item) return;
+    doExport(item.dataset.format);
+  };
+  document.addEventListener("click", (e) => {
+    if (!$("exportMenu")?.contains(e.target)) closeExportMenu();
+  });
 
   $("reset").onclick = () => {
     state.query = state.projQuery = state.dateFrom = state.dateTo = "";
@@ -534,9 +601,14 @@ function wireStaticEvents() {
     } catch (e) { toast("Refresh failed"); }
   };
 
-  $("statsBtn").onclick = openStats;
   $("scrim").onclick = closeOverlays;
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeOverlays(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeOverlays();
+      closeExportMenu();
+      if ($("selbar").classList.contains("expanded")) collapseSelStats();
+    }
+  });
 }
 
 boot();

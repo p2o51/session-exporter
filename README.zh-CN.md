@@ -38,6 +38,20 @@
   [`pricing.json`](pricing.json) 里。
 - **本地且私密** —— 纯 Python 3.9+ 标准库，**零依赖**。Cursor 与 Antigravity 数据库严格只读打开。
 
+## 截图
+
+![会话列表与选中栏](pics/list.png)
+
+*主列表与选中栏*
+
+![来源筛选芯片](pics/sources.png)
+
+*来源芯片*
+
+![花费与用量统计](pics/stats.png)
+
+*花费与用量统计*
+
 ## 快速开始
 
 ```bash

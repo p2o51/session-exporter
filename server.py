@@ -7,8 +7,8 @@ Endpoints
                                      or 202 {status:"building"} while the first scan runs
   GET  /api/sessions?refresh=1   -> force a re-scan (blocks)
   GET  /api/session?source=&id=  -> {meta, messages}
-  POST /api/export               -> body {format:"raw"|"notion", items:[{source,id}], filter}
-                                     -> a .zip download
+  POST /api/export               -> body {format:"raw"|"notion"|"json"|"md", items:[{source,id}], filter}
+                                     -> zip / json / markdown download
 """
 
 from __future__ import annotations
@@ -151,12 +151,18 @@ class Handler(BaseHTTPRequestHandler):
 
         if fmt == "notion":
             blob = exporters.build_notion_zip(items, filter_meta)
-            fname = "sessions-notion.zip"
+            fname, ctype = "sessions-notion.zip", "application/zip"
+        elif fmt == "json":
+            blob = exporters.build_json_export(items, filter_meta)
+            fname, ctype = "sessions.json", "application/json; charset=utf-8"
+        elif fmt == "md":
+            blob = exporters.build_markdown_report(items, filter_meta)
+            fname, ctype = "sessions-report.md", "text/markdown; charset=utf-8"
         else:
             blob = exporters.build_raw_zip(items, filter_meta)
-            fname = "sessions-export.zip"
+            fname, ctype = "sessions-export.zip", "application/zip"
 
-        self._send(200, blob, "application/zip",
+        self._send(200, blob, ctype,
                    extra={"Content-Disposition": f'attachment; filename="{fname}"'})
 
 
