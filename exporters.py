@@ -16,7 +16,12 @@ import re
 import zipfile
 from datetime import datetime, timezone
 
-SOURCE_LABEL = {"claude": "Claude Code", "codex": "Codex", "cursor": "Cursor"}
+SOURCE_LABEL = {
+    "claude": "Claude Code",
+    "codex": "Codex",
+    "cursor": "Cursor",
+    "antigravity": "Antigravity",
+}
 
 
 # ── formatting helpers ───────────────────────────────────────────────────────

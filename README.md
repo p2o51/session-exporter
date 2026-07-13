@@ -4,7 +4,7 @@
 
 # Session Exporter
 
-**Browse & export your Claude Code / Codex / Cursor history — with token & cost accounting.**
+**Browse & export your Claude Code / Codex / Cursor / Antigravity history — with token & cost accounting.**
 
 English · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
@@ -19,14 +19,15 @@ English · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
 ---
 
-A small, elegant **local** web app that reads your **Claude Code**, **Codex**, and **Cursor**
-session history, lets you browse and filter it, and exports it — with real token accounting
-(including cache hits) and cache-aware **cost estimation**. Nothing leaves your machine.
+A small, elegant **local** web app that reads your **Claude Code**, **Codex**, **Cursor**, and
+**Antigravity** session history, lets you browse and filter it, and exports it — with real token
+accounting (including cache hits) and cache-aware **cost estimation**. Nothing leaves your machine.
 
 ## Features
 
-- **One list, three tools** — every Claude Code / Codex / Cursor session together. Filter by
-  source, project folder, date range, and full-text search; sort by recency, cost, tokens, or size.
+- **One list, four tools** — every Claude Code / Codex / Cursor / Antigravity session together.
+  Filter by source, project folder, date range, and full-text search; sort by recency, cost,
+  tokens, or size.
 - **Multi-select → ZIP** — select or select-all (following the active filter), then export a
   self-contained archive: a metadata index plus per-session JSON and a readable Markdown transcript.
 - **Export for Notion** — a CSV + matching Markdown folder that Notion imports as a database
@@ -36,8 +37,8 @@ session history, lets you browse and filter it, and exports it — with real tok
 - **Cost estimation** — every session priced from its tokens × per-model rates, with cache reads
   (0.1×) and Anthropic cache writes (1.25× / 2×) billed correctly. A **Stats** panel breaks cost
   down **by model** and **by date**. Rates live in an editable [`pricing.json`](pricing.json).
-- **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor's
-  database is opened strictly read-only.
+- **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor and
+  Antigravity databases are opened strictly read-only.
 
 ## Quick start
 
@@ -64,6 +65,7 @@ streamed) and caches the result, so relaunches are instant. Hit **Refresh** to r
 | **Claude Code** | `~/.claude/projects/<folder>/<uuid>.jsonl` | `recorded` — summed `usage`, incl. cache create/read |
 | **Codex** | `~/.codex/sessions/**/rollout-*.jsonl` (+ `archived_sessions/`) | `recorded` — final `token_count` (incl. cached input & reasoning) |
 | **Cursor** | global SQLite `…/Cursor/User/globalStorage/state.vscdb` (read-only) | `context-snapshot` — final context size, not spend |
+| **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` (read-only) | `recorded` — `gen_metadata` usage (input, cache read, output, reasoning) |
 
 A `~` flags non-`recorded` numbers so the accounting stays honest; Cursor sessions aren't priced.
 
@@ -76,13 +78,13 @@ model.py          in-memory + on-disk index, token aggregation
 pricing.py        per-model, cache-aware cost engine
 pricing.json      editable per-model rates ($/1M tokens)
 exporters.py      raw-zip and Notion-zip builders
-parsers/          claude.py · codex.py · cursor.py (one contract per source)
+parsers/          claude · codex · cursor · antigravity (one contract per source)
 web/              index.html · styles.css · app.js  (the UI)
 website/          the Rspress documentation site (trilingual)
 ```
 
 Each parser implements one small contract (`list_sessions()` / `load_messages()`), so adding a
-fourth source is a single new file in [`parsers/`](parsers/).
+new source is a single new file in [`parsers/`](parsers/).
 
 ## Documentation
 

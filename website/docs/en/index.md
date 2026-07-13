@@ -4,7 +4,7 @@ pageType: home
 hero:
   name: Session Exporter
   text: Browse & export your AI coding history
-  tagline: Claude Code · Codex · Cursor — one list, with token & cost accounting
+  tagline: Claude Code · Codex · Cursor · Antigravity — one list, with token & cost accounting
   image:
     src: /logo.svg
     alt: Session Exporter
@@ -17,8 +17,8 @@ hero:
       link: https://github.com/p2o51/session-exporter
 
 features:
-  - title: One list, three tools
-    details: Browse every Claude Code, Codex, and Cursor session together. Filter by source, project folder, date range, and full-text search. Sort by recency, cost, tokens, or size.
+  - title: One list, four tools
+    details: Browse every Claude Code, Codex, Cursor, and Antigravity session together. Filter by source, project folder, date range, and full-text search. Sort by recency, cost, tokens, or size.
     icon: 🗂️
   - title: Multi-select → ZIP export
     details: Select or select-all (following the active filter), then export a self-contained archive — metadata index plus a machine-readable JSON and a human-readable Markdown transcript per session.
@@ -33,6 +33,6 @@ features:
     details: Every session priced from its tokens × per-model rates (cache reads 0.1×, Anthropic cache writes 1.25×/2×). A Stats panel breaks cost down by model and by date.
     icon: 💰
   - title: Local & private
-    details: Reads your local session files directly — nothing leaves your machine. Pure Python 3.9+ standard library, zero dependencies. Cursor's database is opened strictly read-only.
+    details: Reads your local session files directly — nothing leaves your machine. Pure Python 3.9+ standard library, zero dependencies. Cursor and Antigravity databases are opened strictly read-only.
     icon: 🔒
 ---

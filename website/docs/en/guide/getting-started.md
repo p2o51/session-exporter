@@ -1,6 +1,6 @@
 # Getting started
 
-Session Exporter is a small local web app that reads your **Claude Code**, **Codex**, and **Cursor** session history, lets you browse and filter it, and exports it — with token and cost accounting.
+Session Exporter is a small local web app that reads your **Claude Code**, **Codex**, **Cursor**, and **Antigravity** session history, lets you browse and filter it, and exports it — with token and cost accounting.
 
 It runs entirely on your machine. Nothing is uploaded anywhere.
 

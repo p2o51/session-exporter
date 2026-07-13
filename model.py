@@ -42,6 +42,9 @@ def _fingerprint() -> str:
     stat_glob("~/.codex/archived_sessions/rollout-*.jsonl")
     # Cursor: the single global db mtime is a good enough signal.
     stat_glob("~/Library/Application Support/Cursor/User/globalStorage/state.vscdb")
+    # Antigravity IDE + CLI: one SQLite DB per conversation.
+    stat_glob("~/.gemini/antigravity/conversations/*.db")
+    stat_glob("~/.gemini/antigravity-cli/conversations/*.db")
 
     parts.sort()
     import hashlib

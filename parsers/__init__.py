@@ -1,15 +1,15 @@
 """Session parser registry.
 
-Each source parser (claude, codex, cursor) is a module exposing two functions
-that together form the PARSER CONTRACT. The rest of the app only ever talks to
-parsers through this contract, so the three sources stay fully decoupled.
+Each source parser (claude, codex, cursor, antigravity) is a module exposing
+two functions that together form the PARSER CONTRACT. The rest of the app only
+ever talks to parsers through this contract, so the sources stay fully decoupled.
 
 ────────────────────────────────────────────────────────────────────────────
 PARSER CONTRACT
 ────────────────────────────────────────────────────────────────────────────
 
 SOURCE: str
-    The source id, one of "claude" | "codex" | "cursor".
+    The source id, one of "claude" | "codex" | "cursor" | "antigravity".
 
 def list_sessions() -> list[dict]:
     Return one metadata dict per session. Does NOT include full messages, but
@@ -65,7 +65,7 @@ from __future__ import annotations
 import importlib
 
 # Order here is the display order in the UI.
-_SOURCE_MODULES = ["claude", "codex", "cursor"]
+_SOURCE_MODULES = ["claude", "codex", "cursor", "antigravity"]
 
 _loaded: dict = {}
 

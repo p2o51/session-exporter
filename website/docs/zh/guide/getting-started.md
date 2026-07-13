@@ -1,6 +1,6 @@
 # 开始使用
 
-Session Exporter 是一个小巧的本地 Web 应用，它读取你的 **Claude Code**、**Codex** 和 **Cursor** 会话历史，让你浏览和筛选，并将其导出 —— 附带 token 与成本核算。
+Session Exporter 是一个小巧的本地 Web 应用，它读取你的 **Claude Code**、**Codex**、**Cursor** 和 **Antigravity** 会话历史，让你浏览和筛选，并将其导出 —— 附带 token 与成本核算。
 
 它完全运行在你的机器上，不会把任何东西上传到任何地方。
 

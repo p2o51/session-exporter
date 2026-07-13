@@ -9,6 +9,7 @@ Session Exporter reads your local session files directly. **Nothing leaves your 
 | **Claude Code** | `~/.claude/projects/<folder>/<uuid>.jsonl` | `recorded` — summed `usage`, including cache create/read |
 | **Codex** | `~/.codex/sessions/**/rollout-*.jsonl` (and `archived_sessions/`) | `recorded` — the final `token_count` event (includes cached input & reasoning) |
 | **Cursor** | the global SQLite DB `…/Cursor/User/globalStorage/state.vscdb` | `context-snapshot` — see below |
+| **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` | `recorded` — `gen_metadata` usage (input, cache read, output, reasoning) |
 
 ### Claude Code
 
@@ -24,12 +25,18 @@ Cursor stores everything in one large SQLite database. Session Exporter opens it
 
 Cursor does not record cumulative token spend or cache activity — only the size of a session's final context window. Session Exporter surfaces that number honestly as `context-snapshot` (marked with `~`) and does **not** compute a cost for it, rather than inventing one.
 
+### Antigravity
+
+Antigravity (IDE and CLI) stores one SQLite database per conversation under `~/.gemini/antigravity/conversations/` and `~/.gemini/antigravity-cli/conversations/`. Session Exporter opens each DB **read-only** (preferring `?immutable=1` so WAL sidecars never block the scan) and decodes the protobuf blobs in `gen_metadata` / `steps` / `trajectory_metadata_blob` with a tiny wire-format reader — no third-party protobuf dependency.
+
+Token totals come from recorded generation metadata (uncached input, cache reads, output text, and reasoning). Workspace paths come from the trajectory metadata. Legacy encrypted `.pb` conversation files are skipped; only the SQLite `.db` format is supported.
+
 ## The cache
 
 The scan result is written to `.cache/index.json` next to the app, keyed by a fingerprint of your session files (paths + sizes + modification times). If nothing changed, relaunches load from cache instantly. If files changed, or you click **Refresh**, the index is rebuilt. Deleting `.cache/` just forces a fresh scan — it's safe.
 
 Cost is applied to the cached index on every load, so editing `pricing.json` takes effect on the next launch (or immediately via **↻ Reload prices**) without re-parsing your data.
 
-## Adding a fourth source
+## Adding another source
 
 Each parser is a single file in `parsers/` implementing a small contract — `list_sessions()` and `load_messages()`. Adding another tool is one new file; nothing else in the app needs to know about it.

@@ -2,10 +2,10 @@
 
 ## Browsing & filtering
 
-Every session from all three tools appears in one list. The left sidebar drives what's shown:
+Every session from all four tools appears in one list. The left sidebar drives what's shown:
 
 - **Search** — matches the title, project, and model.
-- **Source** — toggle Claude Code / Codex / Cursor on and off (each chip shows its session count).
+- **Source** — toggle Claude Code / Codex / Cursor / Antigravity on and off (each chip shows its session count).
 - **Project** — the folder a session belongs to. The list is searchable and ordered by session count.
 - **Date range** — a from/to filter on the session's updated date.
 

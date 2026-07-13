@@ -16,7 +16,12 @@ const state = {
   filtered: [],
 };
 
-const SOURCE_LABEL = { claude: "Claude Code", codex: "Codex", cursor: "Cursor" };
+const SOURCE_LABEL = {
+  claude: "Claude Code",
+  codex: "Codex",
+  cursor: "Cursor",
+  antigravity: "Antigravity",
+};
 const key = (s) => `${s.source}::${s.id}`;
 const $ = (id) => document.getElementById(id);
 
