@@ -93,7 +93,7 @@ server.py         標準ライブラリの HTTP サーバ + JSON/zip API
 model.py          メモリ + ディスクのインデックス、トークン集計
 pricing.py        モデル別・キャッシュ考慮のコストエンジン
 pricing.json      編集可能なモデル別単価（$/1M トークン）
-exporters.py      raw-zip と Notion-zip のビルダー
+exporters.py      ZIP / Notion / JSON / Markdown エクスポートのビルダー
 parsers/          claude · codex · cursor · antigravity · pi（ソースごとに 1 契約）
 web/              index.html · styles.css · app.js（UI）
 website/          Rspress ドキュメントサイト（3 言語）
