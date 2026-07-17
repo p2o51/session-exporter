@@ -187,6 +187,13 @@ class KimiParserTests(unittest.TestCase):
             "kimi-code/kimi-for-coding": (0.95, 4.0, 0.19),
             "kimi-for-coding-highspeed": (1.90, 8.0, 0.38),
             "kimi-code/kimi-for-coding-highspeed": (1.90, 8.0, 0.38),
+            "kimi-k2.6": (0.95, 4.0, 0.16),
+            "k2.6": (0.95, 4.0, 0.16),
+            "kimi-code/k2.6": (0.95, 4.0, 0.16),
+            "kimi-code/kimi-k2.6": (0.95, 4.0, 0.16),
+            "kimi-code/kimi-k2.6-preview": (0.95, 4.0, 0.16),
+            "moonshotai/kimi-k2.6": (0.95, 4.0, 0.16),
+            "kimi-k2.6-preview": (0.95, 4.0, 0.16),
         }
         for alias, rates in expected.items():
             with self.subTest(alias=alias):
