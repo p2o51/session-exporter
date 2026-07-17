@@ -53,9 +53,9 @@ export default defineConfig({
   logoText: 'Session Exporter',
   lang: 'en',
   locales: [
-    { lang: 'en', label: 'English', title: 'Session Exporter', description: 'Browse & export your Claude Code / Codex / Cursor / Antigravity history' },
-    { lang: 'zh', label: '简体中文', title: 'Session Exporter', description: '浏览并导出你的 Claude Code / Codex / Cursor / Antigravity 会话历史' },
-    { lang: 'ja', label: '日本語', title: 'Session Exporter', description: 'Claude Code / Codex / Cursor / Antigravity の履歴を閲覧・エクスポート' },
+    { lang: 'en', label: 'English', title: 'Session Exporter', description: 'Browse & export your local AI coding-agent history' },
+    { lang: 'zh', label: '简体中文', title: 'Session Exporter', description: '浏览并导出本地 AI 编程代理会话历史' },
+    { lang: 'ja', label: '日本語', title: 'Session Exporter', description: 'ローカル AI コーディングエージェントの履歴を閲覧・エクスポート' },
   ],
   themeConfig: {
     footer: { message: 'MIT Licensed · © 2026 Session Exporter' },

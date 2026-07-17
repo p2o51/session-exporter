@@ -4,7 +4,7 @@
 
 # Session Exporter
 
-**浏览并导出你的 Claude Code / Codex / Cursor / Antigravity / Pi Agent 会话历史 —— 附带 token 与花费统计。**
+**浏览并导出你的 Claude Code / Codex / Cursor / Antigravity / Pi Agent / Kimi Code 会话历史 —— 附带 token 与花费统计。**
 
 [English](README.md) · 简体中文 · [日本語](README.ja.md)
 
@@ -20,18 +20,18 @@
 ---
 
 一个小巧、典雅的**本地**网页工具：读取你的 **Claude Code**、**Codex**、**Cursor**、
-**Antigravity**、**Pi Agent** 会话历史，让你浏览、筛选并导出，附带真实的 token 统计（含缓存命中）和
+**Antigravity**、**Pi Agent**、**Kimi Code** 会话历史，让你浏览、筛选并导出，附带真实的 token 统计（含缓存命中）和
 **缓存感知的花费估算**。所有数据都不出本机。
 
 ## 功能
 
-- **五个工具，一个列表** —— 所有 Claude Code / Codex / Cursor / Antigravity / Pi Agent 会话汇总在一起。
+- **六个工具，一个列表** —— 所有 Claude Code / Codex / Cursor / Antigravity / Pi Agent / Kimi Code 会话汇总在一起。
   可按来源、项目文件夹、日期区间、全文搜索筛选；可按时间、花费、token、大小排序。
 - **多选 → 导出菜单** —— 勾选或全选（跟随当前筛选），可导出 ZIP 压缩包、Notion 导入包、JSON，
   或 Markdown 报表（图片导出即将支持）。
 - **含缓存的 token 统计** —— 厂商真实记录的 输入 / 输出 / 缓存读 / 缓存写 / 推理 token，
   以及缓存命中率，按会话和按选中项统计。
-- **花费估算** —— 每个会话按 token × 各模型单价计价，缓存读与 Anthropic / Pi 缓存写都正确计费。
+- **花费估算** —— 每个会话按 token × 各模型单价计价，按服务商处理缓存读，并正确计算 Claude / Pi / Kimi 缓存写。
   展开选中栏即可查看按**模型**和**日期**拆分的 **Stats**。单价存放在可编辑的
   [`pricing.json`](pricing.json) 里。
 - **本地且私密** —— 纯 Python 3.9+ 标准库，**零依赖**。Cursor、Antigravity 等本地数据库严格只读打开。
@@ -77,6 +77,7 @@ python3 app.py --no-open       # 不自动打开浏览器
 | **Cursor** | 全局 SQLite `…/Cursor/User/globalStorage/state.vscdb`（只读） | `context-snapshot` —— 最终上下文大小，非真实花费 |
 | **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db`（只读） | `recorded` —— `gen_metadata` 用量（输入、缓存读、输出、推理） |
 | **Pi Agent** | `~/.pi/agent/sessions/**/*.jsonl` | `recorded` —— 每轮 `usage`（input、output、cacheRead、cacheWrite） |
+| **Kimi Code** | `$KIMI_CODE_HOME/sessions/**/`（默认 `~/.kimi-code`） | `recorded` —— `usage.record`（未缓存输入、输出、缓存读取/创建） |
 
 非 `recorded` 的数字会标 `~`，让统计诚实透明；Cursor 会话不计价。
 
@@ -89,7 +90,7 @@ model.py          内存 + 磁盘索引，token 汇总
 pricing.py        按模型、缓存感知的花费引擎
 pricing.json      可编辑的各模型单价（$/1M tokens）
 exporters.py      ZIP / Notion / JSON / Markdown 导出构建
-parsers/          claude · codex · cursor · antigravity · pi（每个来源一份契约）
+parsers/          claude · codex · cursor · antigravity · pi · kimi（每个来源一份契约）
 web/              index.html · styles.css · app.js（界面）
 website/          Rspress 文档站（三语）
 ```

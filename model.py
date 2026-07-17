@@ -47,6 +47,11 @@ def _fingerprint() -> str:
     stat_glob("~/.gemini/antigravity-cli/conversations/*.db")
     # Pi Agent: JSONL transcripts under encoded cwd folders.
     stat_glob("~/.pi/agent/sessions/**/*.jsonl", recursive=True)
+    # Kimi Code: session metadata plus one wire log per main/sub-Agent.
+    kimi_root = os.path.expanduser(os.environ.get("KIMI_CODE_HOME", "~/.kimi-code"))
+    stat_glob(os.path.join(kimi_root, "session_index.jsonl"))
+    stat_glob(os.path.join(kimi_root, "sessions", "**", "state.json"), recursive=True)
+    stat_glob(os.path.join(kimi_root, "sessions", "**", "wire.jsonl"), recursive=True)
 
     parts.sort()
     import hashlib

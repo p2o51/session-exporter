@@ -11,7 +11,7 @@ For every session it aggregates the usage the provider actually recorded:
 | **Input** | Prompt tokens billed at the full input rate |
 | **Output** | Generated tokens (includes reasoning tokens for OpenAI) |
 | **Cache read** | Tokens served from the prompt cache (heavily discounted) |
-| **Cache write** | Tokens written to the cache (Claude) |
+| **Cache write** | Tokens written to the cache (Claude, Pi, Kimi) |
 | **Reasoning** | Thinking / reasoning tokens (Codex) |
 | **Cache-hit rate** | `cache_read / (input + cache_write + cache_read)` |
 
@@ -21,16 +21,17 @@ These come straight from the session logs — they are **measured, not estimated
 
 Each session is tagged with how its numbers were obtained:
 
-- **`recorded`** — Claude Code and Codex log real usage per turn. Fully accurate.
+- **`recorded`** — Claude Code, Codex, Antigravity, Pi Agent, and Kimi Code expose provider-recorded usage. Fully accurate.
 - **`context-snapshot`** — Cursor only records the size of the final context window, not cumulative spend or cache activity. A `~` marks these numbers, and **cost is not computed** for them (see [Data & privacy](/guide/data-sources)).
 
 ## Cost estimation
 
 Every `recorded` session is priced from its tokens × per-model rates. Caching is billed the way each provider actually bills it:
 
-- **Cache reads** — `0.1×` the input rate.
+- **Cache reads** — the model's configured `cache_read` rate (falling back to `0.1×` input when omitted).
 - **Anthropic cache writes** — `1.25×` for the 5-minute cache, `2×` for the 1-hour cache. Session Exporter reads the 5-min / 1-hour split out of Claude's logs, so the write cost is exact, not approximated.
 - **Codex / OpenAI** — the recorded `input` already includes the cached portion, so cost uses `(input − cached) × input_rate + cached × cache_read_rate + output × output_rate`.
+- **Kimi Code** — `inputOther` is uncached input, cache reads use the published cached-input rate, and cache creation is a cache miss billed at the regular input rate.
 
 Cost shows up as a **Cost** column in the table, a tile in the detail drawer, and a running total on the selection bar and the top bar.
 
@@ -57,14 +58,15 @@ Prices live in an editable [`pricing.json`](https://github.com/p2o51/session-exp
       "input": 5, "output": 25, "cache_read": 0.5,
       "cache_write_5m": 6.25, "cache_write_1h": 10
     },
-    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 }
+    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 },
+    "kimi-k3": { "input": 3.0, "output": 15.0, "cache_read": 0.3 }
   },
   "aliases": { "openai": "gpt-5.5" }
 }
 ```
 
 - `cache_read` — the discounted cached-input rate.
-- `cache_write_5m` / `cache_write_1h` — Anthropic cache-write rates (other providers don't bill cache writes; omit them).
+- `cache_write_5m` / `cache_write_1h` — Anthropic / Pi cache-write rates. Kimi cache creation uses `input` automatically.
 - `aliases` — map a raw model string (e.g. a provider fallback name) to a priced model.
 - `"estimated": true` on a model flags it in the UI with `~`.
 

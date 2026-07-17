@@ -11,7 +11,7 @@ Session Exporter 将每种工具记录的原始用量，转化为按会话和按
 | **输入（Input）** | 按完整输入费率计费的 prompt token |
 | **输出（Output）** | 生成的 token（对 OpenAI 而言包含推理 token） |
 | **缓存读取（Cache read）** | 由 prompt 缓存提供的 token（大幅折扣） |
-| **缓存写入（Cache write）** | 写入缓存的 token（Claude） |
+| **缓存写入（Cache write）** | 写入缓存的 token（Claude、Pi、Kimi） |
 | **推理（Reasoning）** | 思考 / 推理 token（Codex） |
 | **缓存命中率（Cache-hit rate）** | `cache_read / (input + cache_write + cache_read)` |
 
@@ -21,16 +21,17 @@ Session Exporter 将每种工具记录的原始用量，转化为按会话和按
 
 每条会话都会标注其数字是如何获得的：
 
-- **`recorded`** —— Claude Code 和 Codex 会逐轮记录真实用量。完全准确。
+- **`recorded`** —— Claude Code、Codex、Antigravity、Pi Agent 与 Kimi Code 会提供服务商记录的真实用量。完全准确。
 - **`context-snapshot`** —— Cursor 只记录最终上下文窗口的大小，而非累计花费或缓存活动。这类数字会用 `~` 标记，并且**不为其计算成本**（参见 [数据与隐私](/zh/guide/data-sources)）。
 
 ## 成本估算
 
 每条 `recorded` 会话都根据其 token × 各模型费率来定价。缓存则按各服务商实际的计费方式计费：
 
-- **缓存读取** —— 输入费率的 `0.1×`。
+- **缓存读取** —— 使用模型配置的 `cache_read` 费率（未配置时回退为输入费率的 `0.1×`）。
 - **Anthropic 缓存写入** —— 5 分钟缓存为 `1.25×`，1 小时缓存为 `2×`。Session Exporter 会从 Claude 的日志中读取 5 分钟 / 1 小时的拆分，因此写入成本是精确的，而非近似的。
 - **Codex / OpenAI** —— 记录的 `input` 已经包含了缓存部分，因此成本使用 `(input − cached) × input_rate + cached × cache_read_rate + output × output_rate`。
+- **Kimi Code** —— `inputOther` 是未缓存输入，缓存读取使用公开的缓存输入费率，缓存创建则作为缓存未命中按正常输入费率计费。
 
 成本会以表格中的**成本（Cost）**列、详情抽屉中的一个磁贴，以及选择栏和顶栏上的实时合计形式呈现。
 
@@ -57,14 +58,15 @@ Session Exporter 将每种工具记录的原始用量，转化为按会话和按
       "input": 5, "output": 25, "cache_read": 0.5,
       "cache_write_5m": 6.25, "cache_write_1h": 10
     },
-    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 }
+    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 },
+    "kimi-k3": { "input": 3.0, "output": 15.0, "cache_read": 0.3 }
   },
   "aliases": { "openai": "gpt-5.5" }
 }
 ```
 
 - `cache_read` —— 打折后的缓存输入费率。
-- `cache_write_5m` / `cache_write_1h` —— Anthropic 缓存写入费率（其他服务商不对缓存写入计费；可省略）。
+- `cache_write_5m` / `cache_write_1h` —— Anthropic / Pi 缓存写入费率；Kimi 的缓存创建会自动使用 `input` 费率。
 - `aliases` —— 将某个原始模型字符串（例如服务商的回退名称）映射到一个已定价的模型。
 - 在某个模型上设置 `"estimated": true` 会在 UI 中用 `~` 标记它。
 

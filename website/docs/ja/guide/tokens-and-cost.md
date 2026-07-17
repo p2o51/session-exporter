@@ -11,7 +11,7 @@ Session Exporter は、各ツールが記録した生の使用量を、セッシ
 | **入力** | フル入力レートで課金されるプロンプトトークン |
 | **出力** | 生成トークン（OpenAI では推論トークンを含む） |
 | **キャッシュ読み取り** | プロンプトキャッシュから提供されたトークン（大幅に割引） |
-| **キャッシュ書き込み** | キャッシュに書き込まれたトークン（Claude） |
+| **キャッシュ書き込み** | キャッシュに書き込まれたトークン（Claude、Pi、Kimi） |
 | **推論** | 思考 / 推論トークン（Codex） |
 | **キャッシュヒット率** | `cache_read / (input + cache_write + cache_read)` |
 
@@ -21,16 +21,17 @@ Session Exporter は、各ツールが記録した生の使用量を、セッシ
 
 各セッションには、その数値がどのように得られたかがタグ付けされます:
 
-- **`recorded`** — Claude Code と Codex はターンごとの実使用量をログに記録します。完全に正確です。
+- **`recorded`** — Claude Code、Codex、Antigravity、Pi Agent、Kimi Code はプロバイダー記録済みの実使用量を公開します。完全に正確です。
 - **`context-snapshot`** — Cursor は最終的なコンテキストウィンドウのサイズのみを記録し、累積の消費量やキャッシュの動作は記録しません。これらの数値には `~` が付き、**コストは計算されません**（[データとプライバシー](/ja/guide/data-sources) を参照）。
 
 ## コスト見積もり
 
 すべての `recorded` セッションは、トークン数 × モデルごとの単価で価格算出されます。キャッシュは、各プロバイダーが実際に課金する方法に沿って計算されます:
 
-- **キャッシュ読み取り** — 入力レートの `0.1×`。
+- **キャッシュ読み取り** — モデルに設定された `cache_read` レート（未設定時は入力レートの `0.1×`）。
 - **Anthropic のキャッシュ書き込み** — 5 分キャッシュは `1.25×`、1 時間キャッシュは `2×`。Session Exporter は Claude のログから 5 分 / 1 時間の内訳を読み取るため、書き込みコストは近似ではなく正確です。
 - **Codex / OpenAI** — 記録された `input` にはすでにキャッシュ分が含まれているため、コストは `(input − cached) × input_rate + cached × cache_read_rate + output × output_rate` で計算します。
+- **Kimi Code** — `inputOther` は非キャッシュ入力、キャッシュ読取は公開済みのキャッシュ入力レート、キャッシュ作成はキャッシュミスとして通常の入力レートで計算します。
 
 コストは、テーブルの **Cost** 列、詳細ドロワーのタイル、そして選択バーとトップバーの累計として表示されます。
 
@@ -57,14 +58,15 @@ Session Exporter は、各ツールが記録した生の使用量を、セッシ
       "input": 5, "output": 25, "cache_read": 0.5,
       "cache_write_5m": 6.25, "cache_write_1h": 10
     },
-    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 }
+    "gpt-5.5": { "input": 5.0, "output": 30.0, "cache_read": 0.5 },
+    "kimi-k3": { "input": 3.0, "output": 15.0, "cache_read": 0.3 }
   },
   "aliases": { "openai": "gpt-5.5" }
 }
 ```
 
 - `cache_read` — 割引されたキャッシュ入力レート。
-- `cache_write_5m` / `cache_write_1h` — Anthropic のキャッシュ書き込みレート（他のプロバイダーはキャッシュ書き込みを課金しないため、省略してください）。
+- `cache_write_5m` / `cache_write_1h` — Anthropic / Pi のキャッシュ書き込みレート。Kimi のキャッシュ作成には `input` が自動適用されます。
 - `aliases` — 生のモデル文字列（例: プロバイダーのフォールバック名）を、価格設定済みのモデルにマッピングします。
 - モデルに `"estimated": true` を付けると、UI 上で `~` が付きます。
 

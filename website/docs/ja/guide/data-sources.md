@@ -11,6 +11,7 @@ Session Exporter は、ローカルのセッションファイルを直接読み
 | **Cursor** | グローバル SQLite DB `…/Cursor/User/globalStorage/state.vscdb` | `context-snapshot` — 後述 |
 | **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` | `recorded` — `gen_metadata` の使用量（入力・キャッシュ読取・出力・推論） |
 | **Pi Agent** | `~/.pi/agent/sessions/**/*.jsonl` | `recorded` — ターンごとの `usage`（input・output・cacheRead・cacheWrite） |
+| **Kimi Code** | `$KIMI_CODE_HOME/sessions/**/`（既定 `~/.kimi-code`） | `recorded` — `usage.record`（非キャッシュ入力・出力・キャッシュ読取/作成） |
 
 ### Claude Code
 
@@ -35,6 +36,12 @@ Antigravity（IDE と CLI）は、`~/.gemini/antigravity/conversations/` と `~/
 ### Pi Agent
 
 Pi Agent は `~/.pi/agent/sessions/<encoded-cwd>/` の下にセッションごとに 1 つの JSONL ファイルを保存します。各ファイルは `type:"session"` ヘッダ（id、cwd、timestamp）で始まり、その後に `message` イベントが続きます。アシスタントターンには記録済みの `usage`（`input` / `output` / `cacheRead` / `cacheWrite`）が含まれます。Session Exporter はそれらを合算し、text・thinking・toolCall ブロックをトランスクリプトに描画します。
+
+### Kimi Code
+
+Kimi Code は `$KIMI_CODE_HOME/sessions/`（既定 `~/.kimi-code`）の `state.json` にセッションメタデータを、`agents/<agent>/wire.jsonl` に完全な順序付きイベントを保存します。Session Exporter はメイン Agent とすべてのサブ Agent のログを読み、タイムスタンプ順にトランスクリプトを統合し、正規の `usage.record` イベントだけを合算するため、同じ生成を二重計上しません。
+
+正規化された `inputOther`、`output`、`inputCacheRead`、`inputCacheCreation` から正確なトークン・キャッシュ集計を行います。設定済みの `KIMI_CODE_HOME` も尊重します。既知のホスト命令ラッパーは表示タイトルとトランスクリプトから除去し、通常の Kimi CLI プロンプトは変更しません。
 
 ## キャッシュ
 

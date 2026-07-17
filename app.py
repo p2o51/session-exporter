@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Session Exporter — browse & export your Claude Code / Codex / Cursor history.
+"""Session Exporter — browse & export local coding-agent session history.
 
 Run:  python3 app.py            (opens http://127.0.0.1:8765 in your browser)
       python3 app.py --port 9000 --no-open

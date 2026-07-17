@@ -11,6 +11,7 @@ Session Exporter reads your local session files directly. **Nothing leaves your 
 | **Cursor** | the global SQLite DB `…/Cursor/User/globalStorage/state.vscdb` | `context-snapshot` — see below |
 | **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` | `recorded` — `gen_metadata` usage (input, cache read, output, reasoning) |
 | **Pi Agent** | `~/.pi/agent/sessions/**/*.jsonl` | `recorded` — per-turn `usage` (input, output, cacheRead, cacheWrite) |
+| **Kimi Code** | `$KIMI_CODE_HOME/sessions/**/` (default `~/.kimi-code`) | `recorded` — `usage.record` (uncached input, output, cache read/create) |
 
 ### Claude Code
 
@@ -35,6 +36,12 @@ Token totals come from recorded generation metadata (uncached input, cache reads
 ### Pi Agent
 
 Pi Agent stores one JSONL file per session under `~/.pi/agent/sessions/<encoded-cwd>/`. Each file opens with a `type:"session"` header (id, cwd, timestamp), then a stream of `message` events. Assistant turns carry recorded `usage` with `input` / `output` / `cacheRead` / `cacheWrite`. Session Exporter sums those fields and renders text, thinking, and toolCall blocks into the transcript.
+
+### Kimi Code
+
+Kimi Code stores session metadata in `state.json` and the complete ordered event stream in `agents/<agent>/wire.jsonl` under `$KIMI_CODE_HOME/sessions/` (default `~/.kimi-code`). Session Exporter reads the main Agent and every sub-Agent log, merges their transcript events by timestamp, and sums only canonical `usage.record` events so generation usage is never double-counted.
+
+The normalized fields `inputOther`, `output`, `inputCacheRead`, and `inputCacheCreation` provide exact token and cache accounting. The configured `KIMI_CODE_HOME` is respected. Known host instruction wrappers are removed from user-facing titles and transcripts; ordinary Kimi CLI prompts are left unchanged.
 
 ## The cache
 

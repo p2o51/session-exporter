@@ -4,7 +4,7 @@
 
 # Session Exporter
 
-**Browse & export your Claude Code / Codex / Cursor / Antigravity / Pi Agent history — with token & cost accounting.**
+**Browse & export your Claude Code / Codex / Cursor / Antigravity / Pi Agent / Kimi Code history — with token & cost accounting.**
 
 English · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
@@ -20,21 +20,21 @@ English · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 ---
 
 A small, elegant **local** web app that reads your **Claude Code**, **Codex**, **Cursor**,
-**Antigravity**, and **Pi Agent** session history, lets you browse and filter it, and exports
+**Antigravity**, **Pi Agent**, and **Kimi Code** session history, lets you browse and filter it, and exports
 it — with real token accounting (including cache hits) and cache-aware **cost estimation**.
 Nothing leaves your machine.
 
 ## Features
 
-- **One list, five tools** — every Claude Code / Codex / Cursor / Antigravity / Pi Agent session
+- **One list, six tools** — every Claude Code / Codex / Cursor / Antigravity / Pi Agent / Kimi Code session
   together. Filter by source, project folder, date range, and full-text search; sort by recency,
   cost, tokens, or size.
 - **Multi-select → export menu** — select or select-all (following the active filter), then export
   as a ZIP archive, Notion import pack, JSON dump, or Markdown report (image export coming soon).
 - **Token accounting with cache** — real, provider-recorded input / output / cache-read /
   cache-write / reasoning tokens, plus cache-hit rate, per session and per selection.
-- **Cost estimation** — every session priced from its tokens × per-model rates, with cache reads
-  (0.1×) and Anthropic / Pi cache writes billed correctly. Expand the selection bar for **Stats**
+- **Cost estimation** — every session priced from its tokens × per-model rates, with provider-specific
+  cache reads and Claude / Pi / Kimi cache writes billed correctly. Expand the selection bar for **Stats**
   by model and by date. Rates live in an editable [`pricing.json`](pricing.json).
 - **Local & private** — pure Python 3.9+ standard library, **zero dependencies**. Cursor,
   Antigravity, and other local databases are opened strictly read-only.
@@ -80,6 +80,7 @@ streamed) and caches the result, so relaunches are instant. Hit **Refresh** to r
 | **Cursor** | global SQLite `…/Cursor/User/globalStorage/state.vscdb` (read-only) | `context-snapshot` — final context size, not spend |
 | **Antigravity** | `~/.gemini/antigravity{,-cli}/conversations/*.db` (read-only) | `recorded` — `gen_metadata` usage (input, cache read, output, reasoning) |
 | **Pi Agent** | `~/.pi/agent/sessions/**/*.jsonl` | `recorded` — per-turn `usage` (input, output, cacheRead, cacheWrite) |
+| **Kimi Code** | `$KIMI_CODE_HOME/sessions/**/` (default `~/.kimi-code`) | `recorded` — `usage.record` (uncached input, output, cache read/create) |
 
 A `~` flags non-`recorded` numbers so the accounting stays honest; Cursor sessions aren't priced.
 
@@ -92,7 +93,7 @@ model.py          in-memory + on-disk index, token aggregation
 pricing.py        per-model, cache-aware cost engine
 pricing.json      editable per-model rates ($/1M tokens)
 exporters.py      ZIP / Notion / JSON / Markdown export builders
-parsers/          claude · codex · cursor · antigravity · pi (one contract per source)
+parsers/          claude · codex · cursor · antigravity · pi · kimi (one contract per source)
 web/              index.html · styles.css · app.js  (the UI)
 website/          the Rspress documentation site (trilingual)
 ```

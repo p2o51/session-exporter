@@ -1,5 +1,5 @@
 {
-  "_note": "USD per 1,000,000 tokens. Edit to match your own contract rates — changes take effect on next launch, on Refresh, or via the stats panel's 'Reload prices'. 'cache_read' is the discounted cached-input rate. 'cache_write_5m' / 'cache_write_1h' apply to Claude / Pi prompt-cache writes (billed 1.25x / 2x of input); Codex logs expose input and cache reads only. 'estimated: true' flags a best-effort rate. Model keys are matched case-insensitively. Sources: Anthropic pricing (built-in), OpenAI / Z.ai / Moonshot public pricing (July 2026).",
+  "_note": "USD per 1,000,000 tokens. Edit to match your own contract rates — changes take effect on next launch, on Refresh, or via the stats panel's 'Reload prices'. 'cache_read' is the discounted cached-input rate. 'cache_write_5m' / 'cache_write_1h' apply to Claude / Pi prompt-cache writes (billed 1.25x / 2x of input); Kimi cache creation is billed as cache-miss input. 'estimated: true' flags a best-effort rate. Model keys are matched case-insensitively. Sources: Anthropic pricing (built-in), OpenAI / Z.ai / Moonshot public pricing (July 2026).",
 
   "models": {
     "claude-opus-4-8":   {"input": 5,   "output": 25, "cache_read": 0.5,   "cache_write_5m": 6.25,  "cache_write_1h": 10},
@@ -22,6 +22,9 @@
     "gpt-5.3-codex":       {"input": 1.75,  "output": 14.0, "cache_read": 0.175},
     "gpt-5.3-codex-spark": {"input": 1.75,  "output": 14.0, "cache_read": 0.175, "estimated": true},
     "gpt-5":               {"input": 0.625, "output": 5.0,  "cache_read": 0.0625},
+    "kimi-k3":             {"input": 3.0,   "output": 15.0, "cache_read": 0.30},
+    "kimi-k2.7-code":      {"input": 0.95,  "output": 4.0,  "cache_read": 0.19},
+    "kimi-k2.7-code-highspeed": {"input": 1.90, "output": 8.0, "cache_read": 0.38},
     "kimi-k2.6":           {"input": 0.95,  "output": 4.0,  "cache_read": 0.16},
 
     "glm-5.2":             {"input": 1.4,   "output": 4.4,  "cache_read": 0.26},
@@ -43,6 +46,12 @@
     "gpt-5.5-codex": "gpt-5.5",
     "gpt-5.4-codex": "gpt-5.4",
     "gpt-5-codex": "gpt-5",
+    "k3": "kimi-k3",
+    "kimi-code/k3": "kimi-k3",
+    "kimi-for-coding": "kimi-k2.7-code",
+    "kimi-code/kimi-for-coding": "kimi-k2.7-code",
+    "kimi-for-coding-highspeed": "kimi-k2.7-code-highspeed",
+    "kimi-code/kimi-for-coding-highspeed": "kimi-k2.7-code-highspeed",
     "moonshotai/kimi-k2.6": "kimi-k2.6",
     "kimi-k2.6-preview": "kimi-k2.6",
 

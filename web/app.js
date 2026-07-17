@@ -22,6 +22,7 @@ const SOURCE_LABEL = {
   cursor: "Cursor",
   antigravity: "Antigravity",
   pi: "Pi Agent",
+  kimi: "Kimi Code",
 };
 const key = (s) => `${s.source}::${s.id}`;
 const $ = (id) => document.getElementById(id);
@@ -62,7 +63,7 @@ async function boot() {
   wireStaticEvents();
   const sub = $("loadingSub");
   const hints = [
-    "Reading Claude Code, Codex & Cursor history…",
+    "Reading local coding-agent history…",
     "Aggregating token usage…",
     "Codex keeps large rollout files — hang tight…",
   ];

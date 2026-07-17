@@ -12,6 +12,8 @@ source-aware because the tools record token usage with different semantics:
                   separate. Gemini bills thinking/reasoning at the output rate.
   * Pi Agent    — usage.input is UNCACHED; cacheRead / cacheWrite are separate
                   (same shape as Claude-style accounting).
+  * Kimi Code   — inputOther is UNCACHED; cache reads and cache creation are
+                  separate. Cache creation is a cache miss billed at input rate.
   * Cursor      — only a context-window snapshot is recorded, not actual spend, so
                   cost is reported as unknown (None).
 
@@ -88,7 +90,7 @@ def cost_for(session: dict) -> dict:
     else:
         usd = out / _M * out_rate
 
-    if source in ("claude", "antigravity", "pi"):
+    if source in ("claude", "antigravity", "pi", "kimi"):
         # input is uncached; cache_read is a separate line item.
         usd += inp / _M * in_rate
         usd += cr / _M * cr_rate
@@ -103,6 +105,10 @@ def cost_for(session: dict) -> dict:
             else:
                 usd += int(c5 or 0) / _M * cw5_rate
                 usd += int(c1 or 0) / _M * cw1_rate
+        elif source == "kimi":
+            # Kimi reports cache creation separately, but prices it as a
+            # cache-miss input (there is no Anthropic-style write premium).
+            usd += int(t.get("cache_creation") or 0) / _M * in_rate
     else:  # codex / openai: input_tokens already includes the cached portion
         uncached = max(0, inp - cr)
         usd += uncached / _M * in_rate

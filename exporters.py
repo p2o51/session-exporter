@@ -24,6 +24,7 @@ SOURCE_LABEL = {
     "cursor": "Cursor",
     "antigravity": "Antigravity",
     "pi": "Pi Agent",
+    "kimi": "Kimi Code",
 }
 
 
@@ -89,6 +90,7 @@ def render_markdown(meta: dict, messages: list[dict]) -> str:
         f"- **Tokens:** {human_tokens(t.get('total'))} total "
         f"(in {human_tokens(t.get('input'))} · out {human_tokens(t.get('output'))}"
         + (f" · cache read {human_tokens(t.get('cache_read'))}" if t.get("cache_read") else "")
+        + (f" · cache write {human_tokens(t.get('cache_creation'))}" if t.get("cache_creation") else "")
         + (f" · reasoning {human_tokens(t.get('reasoning'))}" if t.get("reasoning") else "")
         + f") · basis: {t.get('basis', 'recorded')}",
     ]
@@ -117,7 +119,7 @@ def render_markdown(meta: dict, messages: list[dict]) -> str:
 CSV_HEADER = [
     "Name", "Source", "Project", "Project Path", "Created", "Updated", "Model",
     "Messages", "Total Tokens", "Input Tokens", "Output Tokens",
-    "Cache Read Tokens", "Reasoning Tokens", "Cache Hit Rate",
+    "Cache Read Tokens", "Cache Write Tokens", "Reasoning Tokens", "Cache Hit Rate",
     "Cost (USD)", "Cost Estimated", "Token Basis", "Session ID",
 ]
 
@@ -138,6 +140,7 @@ def _csv_row(name: str, meta: dict) -> list:
         int(t.get("input") or 0),
         int(t.get("output") or 0),
         int(t.get("cache_read") or 0),
+        int(t.get("cache_creation") or 0),
         int(t.get("reasoning") or 0),
         _pct(t.get("cache_hit_rate")),
         (round(float(cost), 4) if cost is not None else ""),
